@@ -14,7 +14,6 @@ import {
 import { MdSwapHoriz } from "react-icons/md";
 import { TbLayoutSidebarRightExpand } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { darkTheme } from "../theme";
 
 const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkMode }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
