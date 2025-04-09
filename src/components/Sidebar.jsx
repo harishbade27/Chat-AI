@@ -25,8 +25,13 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
   ];
 
   const handleToggleTheme = () => {
-    toggleDarkMode(!darkMode)
-  }
+    toggleDarkMode(!darkMode);
+  };
+
+  const sidebarItem = `flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer 
+    hover:bg-gray-100 dark:hover:bg-gray-700 
+    hover:text-black dark:hover:text-white 
+    rounded`;
 
   return (
     <aside
@@ -37,7 +42,6 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
         md:w-80 md:block ${isSidebarOpen ? "md:w-80" : "md:w-20"} 
         ${isSidebarOpen ? "z-30 fixed inset-0" : "z-20"}`}
     >
-      {/* Mobile Modal Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed bg-black bg-opacity-50 z-10 md:hidden"
@@ -46,7 +50,6 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
       )}
 
       <div>
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <img src={Logo} alt="Logo" className="w-6 h-6" />
@@ -68,7 +71,6 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           </div>
         </div>
 
-        {/* Search */}
         {isSidebarOpen && isSearchOpen && (
           <div className="relative mb-4">
             <FiSearch className={`absolute left-3 top-3 ${theme.subtext}`} />
@@ -80,10 +82,9 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           </div>
         )}
 
-        {/* Company Selector */}
         {isSidebarOpen && (
           <div className="mb-4 space-y-1">
-            <div className={`w-full border rounded-lg px-3 py-2 ${theme.card} flex items-center justify-between cursor-pointer`}>
+            <div className={`w-full border rounded-lg px-3 py-2 ${theme.card} flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-black dark:hover:text-white`}>
               <div className="flex items-center gap-2">
                 <img src={Company} alt="Company Logo" className="w-6 h-6 rounded-full" />
                 <span className={`text-sm font-medium ${theme.subtext}`}>Comm - IT India Pvt Ltd</span>
@@ -99,16 +100,15 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
               </svg>
             </div>
 
-            <div className={`w-full border rounded-lg px-3 py-2 ${theme.card} cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3`}>
+            <div className={`${sidebarItem} ${theme.card}`}>
               <MdSwapHoriz className={`text-2xl ${theme.subtext}`} />
               <span className={`text-sm font-semibold ${theme.subtext}`}>Switch to Portal</span>
             </div>
           </div>
         )}
 
-        {/* New Chat */}
         {isSidebarOpen && (
-          <div className={`w-full px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3`}>
+          <div className={`${sidebarItem}`}>
             <svg
               className={`w-5 h-5 ${theme.subtext}`}
               fill="none"
@@ -122,7 +122,6 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           </div>
         )}
 
-        {/* Recent Chats */}
         {isSidebarOpen && (
           <div className="mt-4 mb-6">
             <p className={`text-xs font-medium mb-2 ${theme.subtext}`}>Recent Chats</p>
@@ -130,7 +129,7 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
               {chatHistory.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group flex items-center justify-between px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${theme.text}`}
+                  className={`group ${sidebarItem} ${theme.text} flex items-center justify-between`}
                 >
                   <div className="flex items-center gap-2">
                     <FiMessageSquare className={`text-lg ${theme.subtext}`} />
@@ -139,7 +138,7 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
                   <BsThreeDotsVertical className={`hidden group-hover:block text-lg ${theme.subtext}`} />
                 </div>
               ))}
-              <div className={`flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${theme.text}`}>
+              <div className={`${sidebarItem} ${theme.text}`}>
                 <span>View more</span>
                 <FiChevronDown className={`text-lg ${theme.subtext}`} />
               </div>
@@ -147,22 +146,21 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           </div>
         )}
 
-        {/* Explore Section */}
         {isSidebarOpen && (
           <div className="space-y-1">
             <p className={`text-xs font-medium mb-2 ${theme.subtext}`}>Explore</p>
 
-            <div className={`flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${theme.text}`}>
+            <div className={`${sidebarItem} ${theme.text}`}>
               <FiUser className={`text-lg ${theme.subtext}`} />
               <span>My Info</span>
             </div>
 
-            <div className={`flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${theme.text}`}>
+            <div className={`${sidebarItem} ${theme.text}`}>
               <FiInbox className={`text-lg ${theme.subtext}`} />
               <span>Inbox</span>
             </div>
 
-            <div className={`flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${theme.text}`}>
+            <div className={`${sidebarItem} ${theme.text}`}>
               <FiCheckCircle className={`text-lg ${theme.subtext}`} />
               <span>My Approval</span>
             </div>
@@ -170,7 +168,6 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
         )}
       </div>
 
-      {/* Mobile Theme Toggle Button */}
       <div className="block md:hidden mt-4">
         <button
           onClick={handleToggleTheme}
