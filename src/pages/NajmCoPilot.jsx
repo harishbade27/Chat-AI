@@ -7,7 +7,7 @@ import { TbLayoutSidebarRightExpand } from "react-icons/tb";
 
 const NajmCoPilot = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const theme = darkMode ? darkTheme : lightTheme;
 
   const toggleDarkMode = () => setDarkMode(!darkMode);

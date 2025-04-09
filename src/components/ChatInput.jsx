@@ -11,9 +11,9 @@ const ChatInput = ({ theme }) => {
   ];
 
   return (
-    <div className={`w-full max-w-4xl mx-auto mt-10 flex flex-col items-center px-4 ${theme.text}`}>
+    <div className={`w-full max-w-4xl mx-auto mt-5 flex flex-col items-center px-4 ${theme.text}`}>
       {/* Heading Section */}
-      <div className="flex flex-col items-center mb-6 w-full">
+      <div className="flex flex-col items-center mb-20 w-full">
         <FaStar className="text-yellow-400 text-3xl mb-2" />
         <h2 className={`text-lg font-semibold text-center ${theme.text}`}>
           Hi, I’m Najm Co-Pilot

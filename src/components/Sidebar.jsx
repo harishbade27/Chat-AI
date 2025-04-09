@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 import Logo from "../assets/images/Logo.png";
 import Company from "../assets/images/Grp.png";
-import { FiSearch, FiMessageSquare, FiUser, FiInbox, FiCheckCircle, FiChevronDown } from "react-icons/fi";
+import {
+  FiSearch,
+  FiMessageSquare,
+  FiUser,
+  FiInbox,
+  FiCheckCircle,
+  FiChevronDown,
+  FiSun,
+  FiMoon,
+} from "react-icons/fi";
 import { MdSwapHoriz } from "react-icons/md";
 import { TbLayoutSidebarRightExpand } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { darkTheme } from "../theme";
 
-const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen }) => {
+const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkMode }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const chatHistory = [
@@ -15,6 +25,10 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen }) => {
     { id: 3, title: "Leave Approved" },
   ];
 
+  const handleToggleTheme = () => {
+    toggleDarkMode(!darkMode)
+  }
+
   return (
     <aside
       className={`h-screen transition-all duration-300 ease-in-out flex flex-col justify-between shadow-sm p-4 
@@ -22,8 +36,7 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen }) => {
         ${darkMode ? theme.background : "bg-white"} 
         ${theme.text} 
         md:w-80 md:block ${isSidebarOpen ? "md:w-80" : "md:w-20"} 
-        ${isSidebarOpen ? "z-30 fixed inset-0" : "z-20"}`
-      }
+        ${isSidebarOpen ? "z-30 fixed inset-0" : "z-20"}`}
     >
       {/* Mobile Modal Overlay */}
       {isSidebarOpen && (
@@ -156,6 +169,27 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen }) => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Mobile Theme Toggle Button */}
+      <div className="block md:hidden mt-4">
+        <button
+          onClick={handleToggleTheme}
+          className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg shadow transition-all duration-200 
+          ${darkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-800"}`}
+        >
+          {darkMode ? (
+            <>
+              <FiMoon className="text-lg" />
+              <span>Dark Mode</span>
+            </>
+          ) : (
+            <>
+              <FiSun className="text-lg" />
+              <span>Light Mode</span>
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );
