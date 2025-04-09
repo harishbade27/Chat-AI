@@ -45,7 +45,7 @@ const ChatInput = ({ theme }) => {
           type="button"
           className="ml-2 p-2 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-300 transition"
         >
-          <FiSend className="w-5 h-5 -rotate-45" />
+          <FiSend className="w-5 h-5" style={{ transform: 'rotate(43deg)' }} />
         </button>
       </div>
 
