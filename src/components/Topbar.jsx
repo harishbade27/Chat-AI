@@ -14,7 +14,7 @@ const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
             className={`w-full flex items-center justify-between px-10 mt-0.5 py-2 ${theme.background} ${theme.text}`}
         >
             <div
-                className={`text-xl font-bold transition-all duration-300 ease-in-out
+                className={`text-lg font-bold transition-all duration-300 ease-in-out
     hidden md:block ${isSidebarOpen ? "ml-80 px-3 fixed" : "ml-0 px-3"}
   `}
             >
@@ -22,7 +22,7 @@ const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
             </div>
 
             <div
-                className={`text-xl font-bold transition-all duration-300 ease-in-out
+                className={`text-lg font-bold transition-all duration-300 ease-in-out
     block md:hidden px-3 ${isSidebarOpen ? "hidden" : ""}
   `}
             > 
