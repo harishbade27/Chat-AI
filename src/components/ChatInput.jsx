@@ -39,7 +39,7 @@ const ChatInput = ({ theme }) => {
       <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-4">
         <input
           placeholder="Ask Najm Co-Pilot"
-          className={`flex-1 h-12 outline-none placeholder-gray-400 dark:placeholder-gray-500 text-sm bg-transparent ${theme.text}`}
+          className={`flex-1 h-12 outline-none placeholder-gray-400 dark:placeholder-gray-500 text-sm bg-transparent ${theme.text} text-gray-900 dark:text-gray-100`}
         />
         <button
           type="button"
