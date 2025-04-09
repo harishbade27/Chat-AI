@@ -25,7 +25,7 @@ const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
                 className={`text-xl font-bold transition-all duration-300 ease-in-out
     block md:hidden px-3 ${isSidebarOpen ? "hidden" : ""}
   `}
-            >
+            > 
                 Najm Co-Pilot
             </div>
 
