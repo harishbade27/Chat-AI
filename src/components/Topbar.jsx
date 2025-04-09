@@ -4,7 +4,6 @@ import { BsGlobe } from "react-icons/bs";
 import Avatar from "../assets/images/avatar.png";
 
 const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
-    const isMobile = "600px"
 
     const iconStyle = {
         color: !darkMode ? "#667085" : undefined,
@@ -29,7 +28,6 @@ const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
             >
                 Najm Co-Pilot
             </div>
-
 
             <div className="flex items-center gap-4 ml-auto">
                 <FiBell className="text-xl cursor-pointer" style={iconStyle} />
