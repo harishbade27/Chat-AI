@@ -1,65 +1,165 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import { FiSend } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 
 const ChatInput = ({ theme }) => {
   const prompts = [
-    "Show my Pay slips",
-    "Salary Breakdown",
-    "Pay slips History",
-    "Payment Details",
+    // "Show my Pay slips",
+    // "Salary Breakdown",
+    // "Pay slips History",
+    // "Payment Details",
   ];
+
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]); // { role: 'user' | 'ai', content: string }
+  const [loading, setLoading] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
+    setShowIntro(false);
+
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer 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",
+          "HTTP-Referer": "https://najm-ai.netlify.app",
+          "X-Title": "najm-ai",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-r1:free",
+          messages: [{ role: "user", content: input }],
+        }),
+      });
+
+      const data = await res.json();
+      const aiMessage = {
+        role: "ai",
+        content: data.choices?.[0]?.message?.content || "No response from AI.",
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessages((prev) => [...prev, { role: "ai", content: "Something went wrong." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={`w-full max-w-4xl mx-auto mt-5 flex flex-col items-center px-4 ${theme.text}`}>
-      {/* Heading Section */}
-      <div className="flex flex-col items-center mb-20 w-full">
-        <FaStar className="text-yellow-400 text-3xl mb-2" />
-        <h2 className={`text-lg font-semibold text-center ${theme.text}`}>
-          Hi, I’m Najm Co-Pilot
-        </h2>
-        <p className={`text-sm mt-1 text-center ${theme.text}`}>
-          How can I help you?
-        </p>
+      {/* Welcome */}
+      {showIntro && (
+        <div className="flex flex-col items-center mb-20 w-full">
+          <FaStar className="text-yellow-400 text-3xl mb-2" />
+          <h2 className={`text-lg font-semibold text-center ${theme.text}`}>
+            Hi, I’m Najm Co-Pilot
+          </h2>
+          <p className={`text-sm mt-1 text-center ${theme.text}`}>
+            How can I help you?
+          </p>
 
-        {/* Mobile Prompts - 2 column grid */}
-        <div className="grid grid-cols-2 gap-2 mt-4 w-full md:hidden">
-          {prompts.map((label) => (
-            <button
-              key={label}
-              className="px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md"
-            >
-              {label}
-            </button>
-          ))}
+          {/* Mobile Prompts */}
+          <div className="grid grid-cols-2 gap-2 mt-4 w-full md:hidden">
+            {prompts.map((label) => (
+              <button
+                key={label}
+                className="px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md"
+                onClick={() => {
+                  setInput(label);
+                  setShowIntro(false);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
+      )}
+
+      {/* Messages */}
+      <div
+        className="w-full mb-6 max-h-[400px] overflow-y-auto pr-2 space-y-4 custom-scroll"
+        style={{ scrollbarWidth: "thin" }}
+      >
+        {messages.map((msg, index) => (
+          <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              className={`px-4 py-2 rounded-xl max-w-[75%] text-sm ${msg.role === "user"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                }`}
+            >
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
+          </div>
+        ))}
+
+        {loading && (
+          <div className="w-full flex justify-center items-center py-8">
+            <FaStar className="animate-spin text-yellow-400 text-3xl" />
+          </div>
+        )}
+
+        {/* Scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Chat Input */}
       <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-4">
         <input
           placeholder="Ask Najm Co-Pilot"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           className="flex-1 h-12 outline-none text-sm bg-transparent text-gray-900 dark:text-gray-100"
         />
         <button
           type="button"
+          onClick={handleSend}
+          disabled={loading}
           className="ml-2 p-2 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-300 transition"
         >
-          <FiSend className="w-5 h-5" style={{ transform: 'rotate(43deg)' }} />
+          <FiSend className="w-5 h-5" style={{ transform: "rotate(43deg)" }} />
         </button>
       </div>
 
       {/* Desktop Prompts */}
-      <div className="hidden md:flex flex-wrap justify-center gap-2">
-        {prompts.map((label) => (
-          <button
-            key={label}
-            className="px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md"
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {showIntro && (
+        <div className="hidden md:flex flex-wrap justify-center gap-2 mt-4">
+          {prompts.map((label) => (
+            <button
+              key={label}
+              className="px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md"
+              onClick={() => {
+                setInput(label);
+                setShowIntro(false);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
