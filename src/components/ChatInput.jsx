@@ -35,7 +35,7 @@ const ChatInput = ({ theme }) => {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: "Bearer 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",
+          Authorization: "Bearer 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",
           "HTTP-Referer": "https://najm-ai.netlify.app",
           "X-Title": "najm-ai",
           "Content-Type": "application/json",
