@@ -9,7 +9,6 @@ Ask anything in natural language—Co-Pilot responds conversationally and contex
 
 ## 🎙️ Voice Input Support
 Microphone-enabled input allows users to talk directly to Co-Pilot.
-Switch between different organizations with seamless data handling.
 
 ## 📱 Responsive Design
 Works beautifully on desktop and mobile devices.
