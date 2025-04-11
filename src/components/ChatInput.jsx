@@ -5,7 +5,6 @@ import { FaStar } from "react-icons/fa";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 
 const ChatInput = ({ theme }) => {
-  const prompts = [];
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -65,7 +64,7 @@ const ChatInput = ({ theme }) => {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: "Bearer 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",
+          Authorization: "",
           "HTTP-Referer": "https://najm-ai.netlify.app",
           "X-Title": "najm-ai",
           "Content-Type": "application/json",
