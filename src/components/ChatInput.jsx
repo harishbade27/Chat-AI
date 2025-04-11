@@ -35,7 +35,7 @@ const ChatInput = ({ theme }) => {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: "Bearer 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",
+          Authorization: "Bearer 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",
           "HTTP-Referer": "https://najm-ai.netlify.app",
           "X-Title": "najm-ai",
           "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const ChatInput = ({ theme }) => {
       const data = await res.json();
       const aiMessage = {
         role: "ai",
-        content: data.choices?.[0]?.message?.content || "No response from AI.",
+        content: data.choices?.[0]?.message?.content || "The server is busy at the moment. Please try again shortly 😊",
       };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {

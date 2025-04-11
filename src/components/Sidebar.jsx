@@ -167,8 +167,7 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           </div>
         )}
       </div>
-
-      <div className="block md:hidden mt-4">
+      <div className="block md:hidden mb-20 mt-4">
         <button
           onClick={handleToggleTheme}
           className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg shadow transition-all duration-200 
@@ -187,6 +186,7 @@ const Sidebar = ({ theme, darkMode, isSidebarOpen, setIsSidebarOpen, toggleDarkM
           )}
         </button>
       </div>
+
     </aside>
   );
 };
