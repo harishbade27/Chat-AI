@@ -153,12 +153,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
           <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`relative pt-4 pr-6 pb-2 pl-4 rounded-xl text-sm break-words w-fit max-w-[90%] sm:max-w-[600px] ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
               <ReactMarkdown
-                components={{
-                  a: ({ node, ...props }) => (
-                    <a {...props} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">
-                      </a>
-                  ),
-                }}
+
               >
                 {msg.content}
               </ReactMarkdown>
@@ -193,7 +188,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-2">
+      <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-2 min-h-[4rem]">
         <input
           placeholder="Ask Najm Co-Pilot"
           value={input}
@@ -204,7 +199,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
               handleSend();
             }
           }}
-          className="flex-1 h-12 outline-none text-sm bg-transparent text-gray-900 dark:text-gray-100"
+          className="flex-1 h-12 min-h-[3rem] outline-none text-sm bg-transparent text-gray-900 dark:text-gray-100"
         />
 
         <button
@@ -226,24 +221,20 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         </button>
       </div>
 
-      {
-        showIntro && (
-          <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
-            {suggestions.map((text, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setShowIntro(false);
-                  handleSend(text);
-                }}
-                className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
-              >
-                {text}
-              </button>
-            ))}
-          </div>
-        )
-      }
+      <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
+        {suggestions.map((text, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              setShowIntro(false);
+              handleSend(text);
+            }}
+            className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            {text}
+          </button>
+        ))}
+      </div>
 
       {copyToast && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-md shadow-lg z-50 text-sm">
