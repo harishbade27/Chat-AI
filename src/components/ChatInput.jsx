@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { FiSend } from "react-icons/fi";
 import { FaStar, FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
 
 const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpen }) => {
   const [loading, setLoading] = useState(false);
@@ -130,7 +131,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
-        setCopyToast("Copied to clipboard!");
+        setCopyToast("Copied!");
         setTimeout(() => setCopyToast(""), 3000);
       },
       (err) => console.error("Error copying text: ", err)
@@ -147,11 +148,10 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         </div>
       )}
 
-      {/* Messages container */}
       <div className="w-full mb-6 max-h-[400px] overflow-y-auto pr-2 space-y-4 custom-scroll" style={{ scrollbarWidth: "thin" }}>
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`px-4 py-2 rounded-xl text-sm break-words w-fit max-w-[90%] sm:max-w-[600px] ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
+            <div className={`relative pt-4 pr-6 pb-2 pl-4 rounded-xl text-sm break-words w-fit max-w-[90%] sm:max-w-[600px] ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
               <ReactMarkdown
                 components={{
                   a: ({ node, ...props }) => (
@@ -161,6 +161,17 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
               >
                 {msg.content}
               </ReactMarkdown>
+
+              {msg.role !== "user" && (
+                <button
+                  onClick={() => copyToClipboard(msg.content)}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                  title="Copy to clipboard"
+                >
+                  <MdContentCopy size={18} />
+                </button>
+
+              )}
             </div>
           </div>
         ))}
@@ -182,7 +193,6 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Chat input */}
       <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-2">
         <input
           placeholder="Ask Najm Co-Pilot"
@@ -216,24 +226,25 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         </button>
       </div>
 
-      {/* Suggestions */}
-      
-      <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
-        {suggestions.map((text, idx) => (
-          <button
-            key={idx}
-            onClick={() => {
-              setShowIntro(false);
-              handleSend(text);
-            }}
-            className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
-          >
-            {text}
-          </button>
-        ))}
-      </div>
+      {
+        showIntro && (
+          <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
+            {suggestions.map((text, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setShowIntro(false);
+                  handleSend(text);
+                }}
+                className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+        )
+      }
 
-      {/* Copy Toast */}
       {copyToast && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-md shadow-lg z-50 text-sm">
           {copyToast}
