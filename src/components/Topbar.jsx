@@ -11,7 +11,7 @@ const Topbar = ({ theme, darkMode, toggleDarkMode, isSidebarOpen }) => {
 
     return (
         <header
-            className={`w-full flex items-center justify-between px-10 mt-0.5 py-2 ${theme.background} ${theme.text}`}
+            className={`w-full flex items-center justify-between px-10 mt-2 py-2 ${theme.background} ${theme.text}`}
         >
             <div
                 className={`text-lg font-bold transition-all duration-300 ease-in-out

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { FiSend } from "react-icons/fi";
-import { FaStar, FaMicrophone, FaMicrophoneSlash, FaCopy } from "react-icons/fa";
+import { FaStar, FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 
 const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpen }) => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,6 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
     "Good afternoon, I have a question.",
   ];
 
-  // Load from localStorage
   useEffect(() => {
     const storedMessages = JSON.parse(localStorage.getItem("chatHistory")) || [];
     setMessages(storedMessages);
@@ -53,11 +52,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
 
   const handleMicClick = () => {
     if (recognitionRef.current) {
-      if (isListening) {
-        recognitionRef.current.stop();
-      } else {
-        recognitionRef.current.start();
-      }
+      isListening ? recognitionRef.current.stop() : recognitionRef.current.start();
     }
   };
 
@@ -76,11 +71,9 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
     setShowIntro(false);
     setAiTyping("");
 
-    // Add user message and store only user messages in localStorage
     setMessages((prev) => {
       const updatedMessages = [...prev, userMessage];
-      const userOnlyMessages = updatedMessages.filter((msg) => msg.role === "user");
-      localStorage.setItem("chatHistory", JSON.stringify(userOnlyMessages));
+      localStorage.setItem("chatHistory", JSON.stringify(updatedMessages));
       return updatedMessages;
     });
 
@@ -89,9 +82,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDgirBU_2uaUzKgM1C7Qlyf9oQruiNd9Vk",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [
               {
@@ -108,7 +99,6 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         data.candidates?.[0]?.content?.parts?.[0]?.text ||
         "The server is busy at the moment. Please try again shortly 😊";
 
-      // Simulate typing effect and add AI message only once
       let i = 0;
       setAiTyping("");
       const typingInterval = setInterval(() => {
@@ -117,12 +107,20 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         if (i === aiText.length) {
           clearInterval(typingInterval);
           setAiTyping("");
-          setMessages((prev) => [...prev, { role: "ai", content: aiText }]);
+          setMessages((prev) => {
+            const updatedMessages = [...prev, { role: "ai", content: aiText }];
+            localStorage.setItem("chatHistory", JSON.stringify(updatedMessages));
+            return updatedMessages;
+          });
         }
       }, 50);
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => [...prev, { role: "ai", content: "Something went wrong." }]);
+      setMessages((prev) => {
+        const updatedMessages = [...prev, { role: "ai", content: "Something went wrong." }];
+        localStorage.setItem("chatHistory", JSON.stringify(updatedMessages));
+        return updatedMessages;
+      });
       setAiTyping("");
     } finally {
       setLoading(false);
@@ -135,9 +133,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         setCopyToast("Copied to clipboard!");
         setTimeout(() => setCopyToast(""), 3000);
       },
-      (err) => {
-        console.error("Error copying text: ", err);
-      }
+      (err) => console.error("Error copying text: ", err)
     );
   };
 
@@ -151,21 +147,21 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         </div>
       )}
 
+      {/* Messages container */}
       <div className="w-full mb-6 max-h-[400px] overflow-y-auto pr-2 space-y-4 custom-scroll" style={{ scrollbarWidth: "thin" }}>
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`px-4 py-2 rounded-xl max-w-[75%] text-sm ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
-            </div>
-            {msg.role === "ai" && (
-              <button
-                onClick={() => copyToClipboard(msg.content)}
-                className="ml-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition"
-                title="Copy to clipboard"
+            <div className={`px-4 py-2 rounded-xl text-sm break-words w-fit max-w-[90%] sm:max-w-[600px] ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
+              <ReactMarkdown
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a {...props} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer" />
+                  ),
+                }}
               >
-                <FaCopy className="w-5 h-5" />
-              </button>
-            )}
+                {msg.content}
+              </ReactMarkdown>
+            </div>
           </div>
         ))}
 
@@ -177,7 +173,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
 
         {aiTyping && (
           <div className="flex justify-start">
-            <div className="px-4 py-2 rounded-xl max-w-[75%] text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+            <div className="px-4 py-2 rounded-xl text-sm break-words w-fit max-w-[90%] sm:max-w-[600px] bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
               <ReactMarkdown>{aiTyping}</ReactMarkdown>
             </div>
           </div>
@@ -186,6 +182,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Chat input */}
       <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-2">
         <input
           placeholder="Ask Najm Co-Pilot"
@@ -219,11 +216,16 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         </button>
       </div>
 
+      {/* Suggestions */}
+      
       <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
         {suggestions.map((text, idx) => (
           <button
             key={idx}
-            onClick={() => handleSend(text)}
+            onClick={() => {
+              setShowIntro(false);
+              handleSend(text);
+            }}
             className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
           >
             {text}
@@ -231,6 +233,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
         ))}
       </div>
 
+      {/* Copy Toast */}
       {copyToast && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-md shadow-lg z-50 text-sm">
           {copyToast}

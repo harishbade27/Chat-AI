@@ -26,9 +26,16 @@ const Sidebar = ({ darkMode, toggleDarkMode, theme, isSidebarOpen, setIsSidebarO
 
 
   useEffect(() => {
-    const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
-    setChatHistory(storedChats);
+    try {
+      const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
+      const validChats = storedChats.filter(chat => chat.id);
+      setChatHistory(validChats);
+    } catch (e) {
+      console.error("Invalid chat history:", e);
+      setChatHistory([]);
+    }
   }, []);
+
 
   const saveChatHistory = (chats) => {
     localStorage.setItem("chatHistory", JSON.stringify(chats));
@@ -83,7 +90,7 @@ const Sidebar = ({ darkMode, toggleDarkMode, theme, isSidebarOpen, setIsSidebarO
 
   return (
     <aside
-      className={`h-screen transition-all duration-300 ease-in-out flex flex-col justify-between shadow-sm p-4 
+      className={`h-screen transition-all duration-300 ease-in-out flex flex-col justify-between shadow-sm px-4 pt-2
         ${isSidebarOpen ? "w-80" : "w-20"} 
         ${darkMode ? theme.background : "bg-white"} 
         ${theme.text} 
@@ -111,11 +118,14 @@ const Sidebar = ({ darkMode, toggleDarkMode, theme, isSidebarOpen, setIsSidebarO
           </div>
           <div className="flex items-center gap-3">
             <FiSearch
-              className={`text-lg cursor-pointer ${theme.subtext}`}
+              className={`text-2xl cursor-pointer ${theme.subtext}`}
               onClick={() => setIsSearchOpen(!isSearchOpen)}
             />
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-              <TbLayoutSidebarRightExpand className={`text-lg cursor-pointer ${theme.subtext}`} />
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className={`top-2 left-4 text-2xl p-1 rounded-full bg-white dark:bg-gray-800 shadow-md ${theme.subtext}`}
+            >
+              <TbLayoutSidebarRightExpand />
             </button>
           </div>
         </div>
@@ -154,7 +164,12 @@ const Sidebar = ({ darkMode, toggleDarkMode, theme, isSidebarOpen, setIsSidebarO
 
         {/* Add Chat */}
         {isSidebarOpen && (
-          <div className={`${sidebarItem}`} onClick={handleNewChat}>
+          <div className={`${sidebarItem}`} onClick={() => {
+            handleNewChat();
+            if (window.innerWidth < 768) {
+              setIsSidebarOpen(false);
+            }
+          }} >
             <svg
               className={`w-5 h-5 ${theme.subtext}`}
               fill="none"
