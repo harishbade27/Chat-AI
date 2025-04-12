@@ -155,7 +155,8 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
               <ReactMarkdown
                 components={{
                   a: ({ node, ...props }) => (
-                    <a {...props} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer" />
+                    <a {...props} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">
+                      </a>
                   ),
                 }}
               >
@@ -170,7 +171,6 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
                 >
                   <MdContentCopy size={18} />
                 </button>
-
               )}
             </div>
           </div>
