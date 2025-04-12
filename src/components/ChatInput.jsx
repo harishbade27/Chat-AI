@@ -1,19 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { FiSend } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
-import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { FaStar, FaMicrophone, FaMicrophoneSlash, FaCopy } from "react-icons/fa";
 
-const ChatInput = ({ theme }) => {
-
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
+const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpen }) => {
   const [loading, setLoading] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [isListening, setIsListening] = useState(false);
+  const [copyToast, setCopyToast] = useState("");
+  const [aiTyping, setAiTyping] = useState("");
 
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  const suggestions = [
+    "Good morning, I need assistance.",
+    "Hello, could you help me with a task?",
+    "Good afternoon, I have a question.",
+  ];
+
+  // Load from localStorage
+  useEffect(() => {
+    const storedMessages = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    setMessages(storedMessages);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,73 +61,111 @@ const ChatInput = ({ theme }) => {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (customInput) => {
+    const messageText = customInput || input;
+    if (!messageText.trim()) return;
 
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage = {
+      id: Date.now(),
+      role: "user",
+      content: messageText,
+    };
+
     setInput("");
     setLoading(true);
     setShowIntro(false);
+    setAiTyping("");
+
+    // Add user message and store only user messages in localStorage
+    setMessages((prev) => {
+      const updatedMessages = [...prev, userMessage];
+      const userOnlyMessages = updatedMessages.filter((msg) => msg.role === "user");
+      localStorage.setItem("chatHistory", JSON.stringify(userOnlyMessages));
+      return updatedMessages;
+    });
 
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: "",
-          "HTTP-Referer": "https://najm-ai.netlify.app",
-          "X-Title": "najm-ai",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-r1:free",
-          messages: [{ role: "user", content: input }],
-        }),
-      });
+      const res = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDgirBU_2uaUzKgM1C7Qlyf9oQruiNd9Vk",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: messageText }],
+              },
+            ],
+          }),
+        }
+      );
 
       const data = await res.json();
-      const aiMessage = {
-        role: "ai",
-        content: data.choices?.[0]?.message?.content || "The server is busy at the moment. Please try again shortly 😊",
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+      const aiText =
+        data.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "The server is busy at the moment. Please try again shortly 😊";
+
+      // Simulate typing effect and add AI message only once
+      let i = 0;
+      setAiTyping("");
+      const typingInterval = setInterval(() => {
+        setAiTyping((prev) => prev + aiText[i]);
+        i++;
+        if (i === aiText.length) {
+          clearInterval(typingInterval);
+          setAiTyping("");
+          setMessages((prev) => [...prev, { role: "ai", content: aiText }]);
+        }
+      }, 50);
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => [...prev, { role: "ai", content: "Something went wrong." }]);
+      setAiTyping("");
     } finally {
       setLoading(false);
     }
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopyToast("Copied to clipboard!");
+        setTimeout(() => setCopyToast(""), 3000);
+      },
+      (err) => {
+        console.error("Error copying text: ", err);
+      }
+    );
+  };
+
   return (
-    <div className={`w-full max-w-4xl mx-auto mt-5 flex flex-col items-center px-4 ${theme.text}`}>
+    <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? "md:ml-64" : "md:ml-0"}`}>
       {showIntro && (
-        <div className="flex flex-col items-center mb-20 w-full">
+        <div className="flex flex-col items-center mb-10 w-full">
           <FaStar className="text-yellow-400 text-3xl mb-2" />
-          <h2 className={`text-lg font-semibold text-center ${theme.text}`}>
-            Hi, I’m Najm Co-Pilot
-          </h2>
-          <p className={`text-sm mt-1 text-center ${theme.text}`}>
-            How can I help you?
-          </p>
+          <h2 className={`text-lg font-semibold text-center ${theme.text}`}>Hi, I’m Najm Co-Pilot</h2>
+          <p className={`text-sm mt-1 text-center ${theme.text}`}>How can I help you?</p>
         </div>
       )}
 
-      {/* Chat Messages */}
-      <div
-        className="w-full mb-6 max-h-[400px] overflow-y-auto pr-2 space-y-4 custom-scroll"
-        style={{ scrollbarWidth: "thin" }}
-      >
+      <div className="w-full mb-6 max-h-[400px] overflow-y-auto pr-2 space-y-4 custom-scroll" style={{ scrollbarWidth: "thin" }}>
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`px-4 py-2 rounded-xl max-w-[75%] text-sm ${msg.role === "user"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-                }`}
-            >
+            <div className={`px-4 py-2 rounded-xl max-w-[75%] text-sm ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"}`}>
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
+            {msg.role === "ai" && (
+              <button
+                onClick={() => copyToClipboard(msg.content)}
+                className="ml-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition"
+                title="Copy to clipboard"
+              >
+                <FaCopy className="w-5 h-5" />
+              </button>
+            )}
           </div>
         ))}
 
@@ -127,11 +175,18 @@ const ChatInput = ({ theme }) => {
           </div>
         )}
 
+        {aiTyping && (
+          <div className="flex justify-start">
+            <div className="px-4 py-2 rounded-xl max-w-[75%] text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+              <ReactMarkdown>{aiTyping}</ReactMarkdown>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Chat Input Bar */}
-      <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-4">
+      <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex items-center px-4 py-4 mb-2">
         <input
           placeholder="Ask Najm Co-Pilot"
           value={input}
@@ -145,7 +200,6 @@ const ChatInput = ({ theme }) => {
           className="flex-1 h-12 outline-none text-sm bg-transparent text-gray-900 dark:text-gray-100"
         />
 
-        {/* Microphone Button */}
         <button
           type="button"
           onClick={handleMicClick}
@@ -155,16 +209,33 @@ const ChatInput = ({ theme }) => {
           {isListening ? <FaMicrophoneSlash className="w-5 h-5" /> : <FaMicrophone className="w-5 h-5" />}
         </button>
 
-        {/* Send Button */}
         <button
           type="button"
-          onClick={handleSend}
+          onClick={() => handleSend()}
           disabled={loading}
           className="ml-2 p-2 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-300 transition"
         >
           <FiSend className="w-5 h-5" style={{ transform: "rotate(43deg)" }} />
         </button>
       </div>
+
+      <div className="w-full flex flex-wrap gap-4 mt-4 justify-center md:justify-start">
+        {suggestions.map((text, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleSend(text)}
+            className="bg-gray-200 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full hover:bg-blue-300 dark:hover:bg-blue-800 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+
+      {copyToast && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-md shadow-lg z-50 text-sm">
+          {copyToast}
+        </div>
+      )}
     </div>
   );
 };
