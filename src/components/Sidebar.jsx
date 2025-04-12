@@ -40,16 +40,6 @@ const Sidebar = ({ darkMode, toggleDarkMode, theme, isSidebarOpen, setIsSidebarO
     setChatHistory([]);
   };
 
-  // const addNewChat = () => {
-  //   const newChat = {
-  //     id: Date.now(),
-  //     title: `New Chat ${chatHistory.length + 1}`,
-  //     content: `This is the content of chat ${chatHistory.length + 1}`,
-  //   };
-  //   const updatedChats = [...chatHistory, newChat];
-  //   saveChatHistory(updatedChats);
-  // };
-
   const deleteChatHistory = (chatId) => {
     const updatedChats = chatHistory.filter((chat) => chat.id !== chatId);
     saveChatHistory(updatedChats);

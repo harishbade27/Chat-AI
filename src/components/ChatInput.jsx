@@ -23,7 +23,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
   useEffect(() => {
     const storedMessages = JSON.parse(localStorage.getItem("chatHistory")) || [];
     setMessages(storedMessages);
-  }, []);
+  }, [setMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,7 +49,7 @@ const ChatInput = ({ theme, input, setInput, messages, setMessages, isSidebarOpe
     } else {
       console.warn("Speech Recognition not supported in this browser.");
     }
-  }, []);
+  }, [setInput]);
 
   const handleMicClick = () => {
     if (recognitionRef.current) {
